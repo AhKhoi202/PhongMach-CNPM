@@ -1,0 +1,32 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="page-nav no-margin row">
+    <div class="container">
+        <div class="row">
+            <h2>Giới thiệu</h2>
+            <ul>
+                <li><a href="/"><i class="fas fa-home"></i>Trang chủ</a></li>
+                <li><i class="fas fa-angle-double-right"></i>Giới thiệu</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<section class="with-medical">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12 txtr">
+                <h4>Tại sao nên chọn phòng khám của chúng tôi <br>
+                    <span>Phòng mạch</span>
+                </h4>
+                <p>Các bác sĩ tốt nhất</p>
+                <p>Các dịch vụ tuyệt vời nhất </p>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <img src="{{ url_for('static', filename='images/why.jpg') }}" alt="">
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+<header>
+    <div id="nav-head" class="header-nav">
+        <div class="container">
+            <div class="row">
+                <a href="/" class="col-lg-2 col-md-3 no-padding col-sm-12 nav-img">
+                    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="">
+                    <a data-toggle="collapse" data-target="#menu" href="#menu"><i
+                            class="fas d-block d-md-none small-menu fa-bars"></i></a>
+                </a>
+                <div id="menu" class="col-lg-8 col-md-9 d-none d-md-block nav-item">
+                    <ul>
+                        <li><a href="/">Trang chủ</a></li>
+                        <li><a href="/about-us">Giới thiệu</a></li>
+                        <li><a href="/services">Dịch vụ</a></li>
+                        <li><a href="/news">Tin tức</a></li>
+                        <li><a href="/contact">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-2 d-none d-lg-block appoint">
+                    <button class="btn btn-info">Đặt lịch khám</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</header>

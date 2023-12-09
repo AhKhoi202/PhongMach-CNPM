@@ -1,0 +1,26 @@
+
+201 - CREATED - The request was successful. We created a new resource and the response body contains the representation.
+{
+  "body": "Sent from your Twilio trial account - Hello test",
+  "num_segments": "1",
+  "direction": "outbound-api",
+  "from": "+12013796798",
+  "date_updated": "Sat, 09 Dec 2023 05:39:53 +0000",
+  "price": null,
+  "error_message": null,
+  "uri": "/2010-04-01/Accounts/AC28f8609c24a6201bb1fa843e4f5eb432/Messages/SM3cc4b7963f9bbce8818eeb315d82844a.json",
+  "account_sid": "AC28f8609c24a6201bb1fa843e4f5eb432",
+  "num_media": "0",
+  "to": "+84386904554",
+  "date_created": "Sat, 09 Dec 2023 05:39:53 +0000",
+  "status": "queued",
+  "sid": "SM3cc4b7963f9bbce8818eeb315d82844a",
+  "date_sent": null,
+  "messaging_service_sid": null,
+  "error_code": null,
+  "price_unit": "USD",
+  "api_version": "2010-04-01",
+  "subresource_uris": {
+    "media": "/2010-04-01/Accounts/AC28f8609c24a6201bb1fa843e4f5eb432/Messages/SM3cc4b7963f9bbce8818eeb315d82844a/Media.json"
+  }
+}
