@@ -86,8 +86,10 @@ class MedicineTag(BaseModel):
         return self.medicine.name + self.tag.name
 
 
-class Schedule(BaseModel):
-    __tablename__ = ''
+class RegistrationForm(BaseModel):
+    __tablename__ = 'registration_form'
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+
 
 
 if __name__ == '__main__':
@@ -97,5 +99,11 @@ if __name__ == '__main__':
         # user1 = User(fullname='admin', username='admin', password='202cb962ac59075b964b07152d234b70',
         #              avatar='https://res.cloudinary.com/dxajszqyt/image/upload/v1670597632/ae382fmw4ye8lamhsvlc.png',
         #              role=Role.Admin)
-        # db.session.add(user1)
+        # db.session.add_all(user1)
+        # db.session.commit()
+        # Đơn vị thuốc
+        # u1 = Unit(name="Chai")
+        # u2 = Unit(name="Vĩ")
+        # u3 = Unit(name="Viên")
+        # db.session.add_all(u1, u2, u3)
         # db.session.commit()
