@@ -1,7 +1,6 @@
 from flask import render_template, request, redirect, url_for
 
-from app import app, login_manager
-from app.models import User
+from app import app, login_manager, dao
 
 
 @app.route('/')
@@ -50,7 +49,7 @@ def register_process():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter_by(id=user_id).first()
+    return dao.get_user_by_id(user_id)
 
 
 if __name__ == '__main__':
