@@ -28,10 +28,12 @@
     <link href="{{ css_url }}" rel="stylesheet">
     {% endfor %}
     {% endif %}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/fav.jpg') }}">
     <style>
             .hide {
                 display: none;
             }
+
 
     </style>
     {% endblock %}
@@ -46,23 +48,27 @@
     <nav id="sidebar">
         <div class="sidebar-header">
             {% block brand %}
-            <a class="navbar-brand" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
+            <a class="navbar-brand"
+               href="{{ admin_view.admin.url }}"
+               style="text-wrap: wrap;">
+                {{ admin_view.admin.name }}
+            </a>
             {% endblock %}
         </div>
 
         {% block main_menu %}
         <ul class="list-unstyled components">
             {{ layout.menu() }}
+
         </ul>
         {% endblock %}
     </nav>
-    <div id="content">
+    <div id="content" style="padding: 0 0 20px 0;">
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-2">
             <div class="container-fluid">
                 <button type="button" id="sidebarCollapse" class="btn btn-info">
                     <i class="fa fa-align-left"></i>
-                    <span>Toggle Sidebar</span>
                 </button>
                 <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse"
                         data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -89,7 +95,7 @@
         {% set render_ctx = h.resolve_ctx() %}
 
         <div class="row">
-            <div class="col-sm-9">
+            <div class="col-sm-11 mx-5">
                 {% block body %}{% endblock %}
             </div>
         </div>
@@ -119,6 +125,7 @@
                 $('#sidebar').toggleClass('active');
             });
         });
+
 
 </script>
 {% if admin_view.extra_js %}

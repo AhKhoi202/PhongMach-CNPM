@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+
+<div class="page-nav no-margin">
+    <h1 class="text-primary">Dữ Liệu Khám Bệnh</h1>
+</div>
+<div class="container">
+    <h2>Bệnh nhân {{current_user.fullname}}</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Ngày khám</th>
+            <th>Triệu chứng</th>
+            <th>Dự đoán bệnh</th>
+            <th>Bác sĩ khám</th>
+            <th>Tiền thuốc</th>
+            <th>Tiền khám</th>
+            <th>Chi tiết</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>2023-12-23</td>
+            <td>Ho và sốt</td>
+            <td>Cảm cúm</td>
+            <td>Bác sĩ B</td>
+            <td>200,000 VND</td>
+            <td>150,000 VND</td>
+            <td>
+                <button class="btn btn-primary detail-btn" data-id="1">Chi tiết hóa đơn</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
