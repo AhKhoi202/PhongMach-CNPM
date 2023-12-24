@@ -1,6 +1,8 @@
 from flask import redirect
 from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+from sqlalchemy import func
+
 from app import app, db
 from app.models import Role, User, Medicine, RegistrationForm, Regulation
 from flask_login import logout_user, current_user
@@ -15,21 +17,18 @@ class AuthenticatedAdmin(ModelView):
 
 class AuthenticatedUser(BaseView):
     def is_accessible(self):
-        return current_user.is_authenticated
-
-
-class AlwaysAccessView(BaseView):
-    def is_accessible(self):
-        return True
+        return current_user.is_authenticated and current_user.role == Role.Admin
 
 
 class UserView(AuthenticatedAdmin):
-    column_list = ['username', 'fullname', 'birthday', 'phone']
+    column_list = ['username', 'fullname', 'birthday', 'phone', 'role']
     column_labels = {
         'fullname': 'Họ tên',
         'birthday': 'Ngày sinh',
         'phone': 'Số điện thoại',
+        'role': 'Chức năng'
     }
+    column_searchable_list = ['username', 'fullname', 'role']
 
 
 class MedicineView(AuthenticatedAdmin):
@@ -60,16 +59,25 @@ class RegistrationFormView(AuthenticatedAdmin):
 
 
 class RegulationView(AuthenticatedAdmin):
-    column_list = ['regulation', 'value']
+    column_list = ['description', 'value']
+    column_labels = {
+        'description': 'Quy định',
+        'value': 'Giá trị',
+    }
 
 
-class MyStatsView(AlwaysAccessView):
+class MyStatsView(AuthenticatedUser):
     @expose("/")
     def index(self):
         return self.render('admin/pages/stats.html')
 
+    @expose("/logout")
+    def logout(self):
+        logout_user()
+        return redirect('/')
 
-class MyLogoutView(AlwaysAccessView):
+
+class MyLogoutView(AuthenticatedUser):
     @expose("/")
     def index(self):
         logout_user()
@@ -92,5 +100,5 @@ admin.add_view(UserView(User, db.session, name="Người dùng"))
 admin.add_view(MedicineView(Medicine, db.session, name="Thuốc"))
 admin.add_view(RegistrationFormView(RegistrationForm, db.session, name="Đơn đăng ký khám bệnh"))
 admin.add_view(RegulationView(Regulation, db.session, name="Quy định"))
-admin.add_view(MyStatsView(name='Thống kê báo cáo'))
+admin.add_view(MyStatsView(name='Thống kê báo cáo', endpoint="statistics"))
 admin.add_view(MyLogoutView(name='Đăng xuất'))
