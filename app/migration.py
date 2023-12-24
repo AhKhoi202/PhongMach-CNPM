@@ -28,13 +28,10 @@ if __name__ == '__main__':
         db.session.commit()
 
         # Quy định
-        db.session.add_all([Regulation(regulation="Số bệnh nhân khám trong 1 ngày", value=40, user_id=1)])
+        db.session.add_all([Regulation(key="user_in_1_day", description="Số bệnh nhân khám trong 1 ngày", value=40, user_id=1)])
         db.session.commit()
 
         db.session.commit()
-        for i in range(12, 22):
-            registration_form = RegistrationForm(user_id={i}, examination_date='2023-12-10')
-            db.session.add(registration_form)
 
         m1 = Medicine(
             name="A.T Alugela",

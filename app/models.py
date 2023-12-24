@@ -182,7 +182,8 @@ class ExaminationBill(BaseModel):
 class Regulation(BaseModel):
     __tablename__ = 'Regulation'
     __table_args__ = {'extend_existing': True}
-    regulation = Column(Text, nullable=False)
+    key = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
     value = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey(User.id), nullable=True)
 

@@ -102,9 +102,14 @@ def registration_form_process():
     form = request.form
     examination_date = request.form.get('examination_date')
     examination_date = datetime.strptime(examination_date, '%Y-%m-%d').date()
+    user_in_1_day = dao.get_regulation_value('user_in_1_day')
+    if dao.count_registration_forms_by_date(examination_date) >= user_in_1_day:
+        error_message = f"Đã đạt giới hạn {user_in_1_day} lần đăng ký trong ngày {examination_date}!!!"
+        return render_template('registration-form.html', err_msg=error_message)
+
     today = datetime.now().date()
     if examination_date < today:
-        error_message = "Ngày đăng ký phải là hôm nay hặc tương lai!!!"
+        error_message = "Ngày đăng ký phải là hôm nay hoặc tương lai!!!"
         return render_template('registration-form.html', err_msg=error_message)
 
     fullname = form.get('fullname')
