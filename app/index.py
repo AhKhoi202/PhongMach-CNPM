@@ -1,10 +1,12 @@
 from datetime import datetime
 import cloudinary.uploader
+from cloudinary.provisioning import user
 from flask import render_template, request, redirect, url_for
 from flask_login import logout_user, login_user, current_user
 
 from app import app, login_manager, dao, decorators
 from app.models import Gender, Role
+from app.utils import is_past_date
 
 
 @app.route('/')
@@ -104,11 +106,11 @@ def registration_form_process():
     examination_date = datetime.strptime(examination_date, '%Y-%m-%d').date()
     user_in_1_day = dao.get_regulation_value('user_in_1_day')
     if dao.count_registration_forms_by_date(examination_date) >= user_in_1_day:
-        error_message = f"Đã đạt giới hạn {user_in_1_day} lần đăng ký trong ngày {examination_date}!!!"
+        error_message = f"Đã đạt giới hạn {user_in_1_day} lần đăng ký " \
+                        f"trong ngày {examination_date.strftime('%d-%m-%Y')}!!!"
         return render_template('registration-form.html', err_msg=error_message)
 
-    today = datetime.now().date()
-    if examination_date < today:
+    if is_past_date(examination_date):
         error_message = "Ngày đăng ký phải là hôm nay hoặc tương lai!!!"
         return render_template('registration-form.html', err_msg=error_message)
 
@@ -120,7 +122,7 @@ def registration_form_process():
                     fullname=fullname,
                     birthday=birthday,
                     phone=phone)
-    dao.registration_form(user_id=user_id,
+    dao.registration_form(user=current_user,
                           examination_date=examination_date)
     return render_template('registration-form.html', success_msg="Đăng ký lịch hẹn thành công!!!")
 

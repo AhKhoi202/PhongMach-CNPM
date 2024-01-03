@@ -1,0 +1,53 @@
+{% extends 'admin/index.html' %}
+
+{% block body %}
+{% if success_msg %}
+<div class="alert alert-info container mx-auto mb-4">
+    {{ success_msg }}
+</div>
+{% endif %}
+{% if err_msg %}
+<div class="alert alert-danger col-12">
+    {{ err_msg }}
+</div>
+{% endif %}
+<div class="page-nav no-margin">
+    <h1 class="text-primary">Xem và Hoàn thành lịch khám</h1>
+</div>
+<div class="container mt-4">
+    <form action="" method="post"  class="row">
+        <div class="form-group row col-9">
+            <label for="examinationDate" class="col-2 mt-2">Ngày khám:</label>
+            <input type="date"
+                   class="form-control col-10"
+                   id="examinationDate"
+                   name="examinationDate"
+            >
+        </div>
+      <div class="col-3">
+        <button class="btn btn-info">Xem danh sách khám</button>
+      </div>
+    </form>
+    <script>
+        function setTodayDate() {
+            document.getElementById("appointmentDate").valueAsDate = new Date();
+        }
+        window.onload = () => {
+            setTodayDate();
+            {% if form_data %}
+            document.querySelector("#fullName").value = '{{ form_data.get('fullname')}}'
+            document.querySelector("#email").value = '{{ form_data.get('email')}}'
+            document.querySelector("#phone").value = '{{ form_data.get('phone')}}'
+            document.querySelector("#appointmentDate").value = '{{form_data.get('appointmentDate')}}'
+            document.querySelector("#birthday").value = '{{form_data.get('birthday')}}'
+
+
+            {% endif %}
+        }
+        document.querySelector('#today').addEventListener('change', () => {
+            document.querySelector('#appointmentDate').readOnly = true;
+            setTodayDate();
+        })
+    </script>
+</div>
+{% endblock %}

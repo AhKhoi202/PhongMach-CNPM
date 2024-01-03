@@ -21,6 +21,8 @@ def register_user(**kwargs):
     new_user = User(**kwargs)
     db.session.add(new_user)
     db.session.commit()
+    db.session.flush()
+    return new_user
 
 
 def update_user(user_id, **kwargs):
@@ -55,7 +57,8 @@ def get_medical_bill(patient_id=None, phone=None):
     return medical_bills
 
 
-def get_examination_bill(medical_bill_id):
+def get_examination_bill(medical_bill_id, examination_date):
+    query = ExaminationBill.query
     return ExaminationBill.query.filter_by(medical_bill_id=medical_bill_id).first()
 
 
@@ -83,7 +86,9 @@ def registration_form(**kwargs):
 
 def get_regulation_value(key):
     regulation = Regulation.query.filter_by(key=key).first()
-    return regulation.value
+    if regulation:
+        return regulation.value
+    return 0
 
 
 if __name__ == '__main__':
