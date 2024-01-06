@@ -120,7 +120,7 @@ class RegistrationForm(BaseModel):
     __table_args__ = {'extend_existing': True}
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     examination_date = Column(Date, nullable=False)
-
+    accepted = Column(Boolean, default=False)
     user = relationship('User', back_populates='registration_forms', lazy=True)
 
     def __str__(self):

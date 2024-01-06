@@ -59,7 +59,11 @@ def get_medical_bill(patient_id=None, phone=None):
 
 def get_examination_bill(medical_bill_id, examination_date):
     query = ExaminationBill.query
-    return ExaminationBill.query.filter_by(medical_bill_id=medical_bill_id).first()
+    if examination_date:
+        query = query.filter(examination_date=examination_date)
+    if medical_bill_id:
+        return query.filter_by(medical_bill_id=medical_bill_id).first()
+    return query.all()
 
 
 def get_medical_bill_detail(medical_bill_id):
@@ -91,8 +95,60 @@ def get_regulation_value(key):
     return 0
 
 
+def get_registration_form(examination_date):
+    registration_forms = RegistrationForm.query.filter(
+        RegistrationForm.examination_date == examination_date
+    )
+    return mappingFormsToData(registration_forms)
+
+
+def delete_examination(examination_id):
+    form = RegistrationForm.query.get(examination_id)
+    if form:
+        try:
+            db.session.delete(form)
+            db.session.commit()
+            return True
+        except:
+            return False
+    return False
+
+
+def update_complete_form(complete_date):
+    try:
+        forms_to_update = RegistrationForm.query \
+            .filter(RegistrationForm.examination_date == complete_date).all()
+        if forms_to_update:
+            for form in forms_to_update:
+                form.accepted = True
+            db.session.commit()
+            return mappingFormsToData(forms_to_update)
+        return []
+    except:
+        return []
+
+
+def mappingFormsToData(forms):
+    registration_data = []
+    for form in forms:
+        user = form.user
+        registration_info = {
+            "user_id": user.id,
+            "fullname": user.fullname,
+            "phone": user.phone,
+            "birthday": user.birthday,
+            "examination_date": form.examination_date,
+            "id": form.id,
+            "accepted": form.accepted
+        }
+        registration_data.append(registration_info)
+    return registration_data
+
+
 if __name__ == '__main__':
     with app.app_context():
-        new_date = date(2023, 12, 25)
+        new_date = date(2024, 1, 3)
         bill = get_regulation_value('user_in_1_day')
         print(bill)
+        registration_data = get_registration_form(new_date)
+        print(registration_data)

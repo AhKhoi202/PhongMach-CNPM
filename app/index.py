@@ -1,8 +1,9 @@
 from datetime import datetime
 import cloudinary.uploader
 from cloudinary.provisioning import user
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, jsonify
 from flask_login import logout_user, login_user, current_user
+from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 
 from app import app, login_manager, dao, decorators
 from app.models import Gender, Role
@@ -125,6 +126,14 @@ def registration_form_process():
     dao.registration_form(user=current_user,
                           examination_date=examination_date)
     return render_template('registration-form.html', success_msg="Đăng ký lịch hẹn thành công!!!")
+
+
+@app.route('/delete-exam/<int:exam_id>', methods=['DELETE'])
+def delete_exam(exam_id):
+    if dao.delete_examination(exam_id):
+        return jsonify({"message": f"Examination with ID {exam_id} deleted successfully"}), 200
+    else:
+        return jsonify({"error:": f"Something wrong"}), 500
 
 
 @app.route('/history')

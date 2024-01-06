@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from flask import redirect, request
 from flask_admin import Admin, BaseView, expose, AdminIndexView
@@ -86,11 +86,39 @@ class NurseRegisterView(AuthenticatedUser):
 
 class NurseCompleteView(AuthenticatedUser):
     @expose('/', methods=['GET', 'POST'])
-    def nurse_register(self):
+    def nurse_complete(self):
+        today = datetime.today().date()
+        examination_date = request.args.get('examination-date')
+        if examination_date is None:
+            examination_date = today
+        else:
+            examination_date = datetime.strptime(examination_date, "%Y-%m-%d").date()
         if request.method == 'GET':
-            return self.render('admin/nurses/complete-view.html')
 
-        return self.render('admin/nurses/complete-view.html')
+            registration_data = dao.get_registration_form(examination_date)
+
+            return self.render('admin/nurses/complete-view.html',
+                               registration_data=registration_data,
+                               examination_date=examination_date,
+                               today=today)
+        complete_date = request.form.get('complete-date')
+        data = dao.update_complete_form(complete_date)
+        # send SMS
+        utils.send_SMS(utils.get_phones(data), complete_date)
+        return self.render('admin/nurses/complete-view.html',
+                           registration_data=data,
+                           examination_date=examination_date,
+                           today=today,
+                           accepted=True)
+
+
+class NurseCompletePayment(AuthenticatedUser):
+    @expose('/', methods=['GET', 'POST'])
+    def complete_payment(self):
+        if request.method == 'GET':
+            return self.render('admin/nurses/complete-payment.html')
+
+        return self.render('admin/nurses/complete-payment.html')
 
 
 class NurseLogoutView(AuthenticatedUser):
@@ -108,4 +136,5 @@ nurse = Admin(app=app,
               index_view=MyNurseView(name="Trang chủ", endpoint="nurse", url="/nurse"))
 nurse.add_view(NurseRegisterView(name="Đăng ký khám", endpoint="register"))
 nurse.add_view(NurseCompleteView(name="Hoàn tất lịch khám", endpoint="complete"))
+nurse.add_view(NurseCompletePayment(name="Thanh toán hóa đơn", endpoint="payment"))
 nurse.add_view(NurseLogoutView(name="Đăng xuất"))

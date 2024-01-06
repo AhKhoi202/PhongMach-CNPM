@@ -23,7 +23,7 @@
                    id="fullName"
                    name="fullname"
                    placeholder="Nhập họ và tên"
-                    {% if is_fullname_error %}
+                   {% if is_fullname_error %}
                     autofocus
                    {% endif %}
             >
@@ -113,7 +113,7 @@
             document.querySelector("#email").value = '{{ form_data.get('email')}}'
             document.querySelector("#phone").value = '{{ form_data.get('phone')}}'
             document.querySelector("#appointmentDate").value = '{{form_data.get('appointmentDate')}}'
-            document.querySelector("#birthday").value = '{{form_data.get('birthday')}}'
+            document.querySelector("#birthday").value = '{{ form_data.get('birthday') }}'
 
 
             {% endif %}

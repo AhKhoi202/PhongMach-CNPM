@@ -27,10 +27,15 @@ cloudinary.config(cloud_name='dcvdmnrvo', api_key='483432986537474', api_secret=
 from twilio.rest import Client
 
 account_sid = 'AC28f8609c24a6201bb1fa843e4f5eb432'
-auth_token = 'c900e4cfc84ed1e076915b8b3e60743b'
+auth_token = '915eb1c20399b07bd1d2a45bdbd4842e'
 client = Client(account_sid, auth_token)
 
+validation_request = client.validation_requests.create(
+                                friendly_name='My Home Phone Number',
+                                phone_number='+84387-73500'
+                            )
 
+print(validation_request.friendly_name)
 # message = client.messages.create(
 #   from_='+12013796798',
 #   body='Hello test',
