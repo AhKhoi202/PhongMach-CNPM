@@ -1,0 +1,139 @@
+{% extends 'admin/index.html' %}
+
+{% block body %}
+<style>
+    .table-scroll {
+        overflow-y: auto;
+        max-height: 200px;
+    }
+
+
+
+
+
+</style>
+{% if success_msg %}
+<div class="alert alert-info container mx-auto mb-4">
+    {{ success_msg }}
+</div>
+{% endif %}
+{% if err_msg %}
+<div class="alert alert-danger col-12">
+    {{ err_msg }}
+</div>
+{% endif %}
+<div class="page-nav no-margin">
+    <h1 class="text-primary">Lập phiếu khám </h1>
+</div>
+<div class="container">
+    <form action="" method="post" class="row">
+        <div class="form-group col-3">
+            <label for="fullName">Họ và Tên</label>
+            <input type="text"
+                   class="form-control col-12"
+                   id="fullName"
+                   name="fullname"
+                   value="{{ registration_form.user.fullname }}"
+                   disabled
+            >
+        </div>
+        <div class="form-group col-3">
+            <label for="birthday">Ngày Sinh</label>
+            <input type="date"
+                   class="form-control col-12"
+                   id="birthday"
+                   name="birthday"
+                   value="{{ registration_form.user.birthday }}"
+                   disabled
+            >
+        </div>
+        <div class="form-group col-3">
+            <label for="appointmentDate">Ngày Khám</label>
+            <input type="date"
+                   class="form-control"
+                   id="appointmentDate"
+                   name="appointmentDate"
+                    disabled
+            />
+        </div>
+        <div class="form-group col-3">
+            <label for="phone">Số Điện Thoại</label>
+            <input type="text"
+                   class="form-control col-12"
+                   id="phone"
+                   placeholder="Nhập số điện thoại"
+                   name="phone"
+                   value="{{ registration_form.user.phone }}"
+                   disabled
+            >
+        </div>
+        <div class="form-group col-4">
+            <label for="medicine">Tên thuốc</label>
+            <select id="medicine" name="medicine" class="form-control">
+                {% for medicine in medicines %}
+                <option value="{{ medicine.id }}">{{ medicine.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-2">
+            <label for="quantity">Số lượng</label>
+            <input
+                    type="text"
+                    class="form-control"
+                    id="quantity"
+                    name="quantity">
+        </div>
+        <div class="form-group col-2">
+            <label for="direction">Cách dùng</label>
+            <input
+                    type="text"
+                    class="form-control"
+                    id="direction"
+                    name="direction">
+        </div>
+        <button type="submit" class="form-group col-2 btn btn-primary">Thêm thuốc</button>
+    </form>
+
+</div>
+<div class="container mt-4">
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Thuốc</th>
+            <th>Số lượng</th>
+            <th>Đơn vị</th>
+            <th>Cách dùng</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for record in examination_data %}
+        <tr>
+            <td>{{ record.fullname }}</td>
+            <td>{{ record.phone }}</td>
+            <td>{{ record.birthday }}</td>
+            <td>{{ record.examination_date }}</td>
+            <td>
+
+                <button class="btn btn-success detail-btn">
+                    Xem lịch sử khám
+                </button>
+
+                <button class="btn btn-info detail-btn ">
+                    Tạo phiếu khám
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Lưu phiếu</button>
+</div>
+<script>
+    function setTodayDate() {
+        document.getElementById("appointmentDate").valueAsDate = new Date();
+    }
+    setTodayDate()
+
+</script>
+{% endblock %}

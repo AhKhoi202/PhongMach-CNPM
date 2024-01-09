@@ -174,6 +174,7 @@ class ExaminationBill(BaseModel):
     examination_money = Column(Float, default=0)
     medical_bill_id = Column(Integer, ForeignKey(MedicalBill.id), nullable=False, unique=True)
     patient_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    paid = Column(Boolean, default=False)
 
     medical_bill = relationship('MedicalBill', back_populates='examination_bill', lazy=False, uselist=False)
     patient = relationship('User', back_populates='examination_bills', lazy=False, foreign_keys=[patient_id])

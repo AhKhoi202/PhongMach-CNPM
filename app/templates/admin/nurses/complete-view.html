@@ -1,6 +1,12 @@
 {% extends 'admin/index.html' %}
 
 {% block body %}
+<style>
+    .table-scroll {
+        overflow-y: auto;
+        max-height: 200px;
+    }
+</style>
 {% if success_msg %}
 <div class="alert alert-info container mx-auto mb-4">
     {{ success_msg }}
@@ -30,7 +36,8 @@
         </div>
     </form>
     {% if registration_data %}
-    <table class="table table-bordered table-striped">
+    <div class="table-scroll">
+        <table class="table table-bordered table-striped">
         <thead>
         <tr>
             <th>Họ tên</th>
@@ -73,6 +80,8 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
+
     {% if examination_date >= today %}
     {% if registration_data[0].accepted == True %}
     <div class="alert alert-success" role="alert">

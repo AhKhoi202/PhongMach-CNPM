@@ -95,11 +95,16 @@ def get_regulation_value(key):
     return 0
 
 
-def get_registration_form(examination_date):
-    registration_forms = RegistrationForm.query.filter(
+def get_registration_form(**kwargs):
+    registration_forms = RegistrationForm.query
+    id = kwargs.get("id")
+    if id:
+        return registration_forms.get(id)
+    examination_date = kwargs.get("examination_date")
+    registration_forms = registration_forms.filter(
         RegistrationForm.examination_date == examination_date
     )
-    return mappingFormsToData(registration_forms)
+    return map_form_to_data(registration_forms)
 
 
 def delete_examination(examination_id):
@@ -122,13 +127,13 @@ def update_complete_form(complete_date):
             for form in forms_to_update:
                 form.accepted = True
             db.session.commit()
-            return mappingFormsToData(forms_to_update)
+            return map_form_to_data(forms_to_update)
         return []
     except:
         return []
 
 
-def mappingFormsToData(forms):
+def map_form_to_data(forms):
     registration_data = []
     for form in forms:
         user = form.user
@@ -145,10 +150,88 @@ def mappingFormsToData(forms):
     return registration_data
 
 
+def get_complete_payment(phone_to_search=None):
+    query = ExaminationBill.query.join(
+        User, ExaminationBill.patient_id == User.id
+    ).add_columns(
+        User.fullname,
+        User.phone,
+        ExaminationBill.paid,
+        ExaminationBill.id,
+        ExaminationBill.medicine_money,
+        ExaminationBill.examination_date,
+        ExaminationBill.examination_money,
+        (ExaminationBill.medicine_money + ExaminationBill.examination_money).label('total_cost'),
+        ExaminationBill.medical_bill_id
+    )
+    if phone_to_search:
+        query = query.filter(User.phone.ilike(f'%{phone_to_search}%'))
+    results = query.all()
+    payments = []
+    for result in results:
+        payment = {
+            'examination_date': result.examination_date,
+            'patient_name': result.fullname,
+            'phone': result.phone,
+            'medicine_cost': result.medicine_money,
+            'examination_cost': result.examination_money,
+            'total_cost': result.total_cost,
+            'medical_bill_id': result.medical_bill_id,
+            'paid': result.paid,
+            'id': result.id,
+        }
+        payments.append(payment)
+    return payments
+
+
+def update_complete_payment(ex_id):
+    try:
+        exam = ExaminationBill.query.get(ex_id)
+        if exam:
+            exam.paid = True
+            db.session.commit()
+            return exam.paid
+        return []
+    except:
+        return []
+
+
+def get_medicine_details(medical_bill_id):
+    results = MedicalBillDetail.query.join(
+        Medicine, Medicine.id == MedicalBillDetail.medicine_id
+    ).filter(
+        MedicalBillDetail.medical_bill_id == medical_bill_id
+    ).with_entities(
+        Medicine.name,
+        MedicalBillDetail.quantity,
+        MedicalBillDetail.direction,
+        Medicine.price
+    ).all()
+    medicine_details = []
+    total_amount = 0
+    for result in results:
+        total_cost = result.price * result.quantity
+        total_amount += total_cost
+        detail = {
+            'name': result.name,
+            'quantity': result.quantity,
+            'direction': result.direction,
+            'price': result.price,
+            'total_cost': total_cost,
+
+        }
+        medicine_details.append(detail)
+
+    return medicine_details, total_amount
+
+
 if __name__ == '__main__':
     with app.app_context():
         new_date = date(2024, 1, 3)
+        today = datetime.today().date()
         bill = get_regulation_value('user_in_1_day')
-        print(bill)
-        registration_data = get_registration_form(new_date)
+        # print(today)
+        registration_data = get_registration_form(today)
         print(registration_data)
+        # payment = get_medicine_details(1)
+        # print(payment)
