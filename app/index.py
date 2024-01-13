@@ -1,4 +1,6 @@
 from datetime import datetime
+from imaplib import Debug
+
 import cloudinary.uploader
 from cloudinary.provisioning import user
 from flask import render_template, request, redirect, url_for, jsonify, session
@@ -203,6 +205,22 @@ def add_medicine_to_cart():
     session['bill'] = bill
 
     return jsonify(session['bill'])
+
+
+@app.route('/api/medicine/delete', methods=['POST'])
+@decorators.authenticated_user
+def delete_medicine_from_cart():
+    data = request.json
+    print(data)
+    bill = session.get('bill')
+    if bill is not None:
+        id_to_delete = str(data.get("id"))
+        if id_to_delete in bill:
+            del bill[id_to_delete]
+            session['bill'] = bill
+            return jsonify(session['bill'])
+
+    return jsonify({"message": "Fail"})
 
 
 @app.route('/api/medicine/save', methods=['POST'])

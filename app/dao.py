@@ -226,7 +226,7 @@ def get_medicine_details(medical_bill_id):
     ).with_entities(
         Medicine.name,
         MedicalBillDetail.quantity,
-        MedicalBillDetail.direction,
+        Medicine.direction,
         Medicine.price
     ).all()
     medicine_details = []

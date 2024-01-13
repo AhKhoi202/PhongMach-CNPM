@@ -5,13 +5,29 @@ function renderMedicineToTable(data = []) {
         <td>${ m.unit }</td>
         <td>${ m.direction }</td>
         <td>
-          <button class="btn btn-info detail-btn">Xóa</button>
+          <button class="btn btn-info detail-btn" onclick="deleteMedicine('${m.id}')">Xóa</button>
         </td>
       </tr>`)
       .join('')
     document.getElementById('tbody').innerHTML = html;
 }
 
+function deleteMedicine(id) {
+    fetch("/api/medicine/delete", {
+        method: "post",
+        body: JSON.stringify({ id }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then(function (res) {
+        return res.json();
+    })
+    .then(function (data) {
+        console.log(data);
+        renderMedicineToTable(data);
+    });
+}
 function renderHistoryToTable(data = []) {
     const html = Object.values(data).map(m => `<tr>
         <td>${ m.examination_date }</td>
