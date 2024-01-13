@@ -110,20 +110,24 @@ class NurseCompleteView(EmployeeView):
             examination_date = datetime.strptime(examination_date, "%Y-%m-%d").date()
         if request.method == 'GET':
             registration_data = dao.get_registration_form(examination_date=examination_date)
-
+            all_confirmed = all(record['accepted'] for record in registration_data)
             return self.render('admin/nurses/complete-view.html',
                                registration_data=registration_data,
                                examination_date=examination_date,
-                               today=today)
+                               today=today,
+                               all_confirmed=all_confirmed)
         complete_date = request.form.get('complete-date')
         data = dao.update_complete_form(complete_date)
+        all_confirmed = all(record['accepted'] for record in data)
+
         # send SMS
         utils.send_SMS(utils.get_phones(data), complete_date)
         return self.render('admin/nurses/complete-view.html',
                            registration_data=data,
                            examination_date=examination_date,
                            today=today,
-                           accepted=True)
+                           accepted=True,
+                           all_confirmed=all_confirmed)
 
 
 class NurseCompletePayment(EmployeeView):

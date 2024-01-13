@@ -7,6 +7,7 @@
         max-height: 600px;
     }
 </style>
+
 {% if success_msg %}
 <div class="alert alert-info container mx-auto mb-4">
     {{ success_msg }}
@@ -58,7 +59,7 @@
                 <button
                         data-id="{{ record.user_id }}"
                         data-record-id="{{ record.id }}"
-                        {% if examination_date> today or registration_data[0].accepted == True and registration_data[-1].accepted == True %}
+                        {% if examination_date> today or all_confirmed %}
                     disabled
                     class="btn btn-dark detail-btn delete"
                     {% else %}
@@ -75,7 +76,7 @@
     </div>
 
     {% if examination_date >= today %}
-    {% if registration_data[0].accepted == True and registration_data[-1].accepted == True %}
+    {% if all_confirmed  %}
     <div class="alert alert-success" role="alert">
         <h4 class="alert-heading">Đã xác nhận lịch khám </h4>
     </div>
