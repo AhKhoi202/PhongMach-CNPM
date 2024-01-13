@@ -37,7 +37,7 @@ class MyNurseView(AdminIndexView):
         return self.render('admin/nurses/index.html')
 
 
-class NurseRegisterView(AuthenticatedUser):
+class NurseRegisterView(EmployeeView):
     @expose('/', methods=['GET', 'POST'])
     def nurse_register(self):
         template_str = 'admin/nurses/medical-appointment.html'
@@ -99,7 +99,7 @@ class NurseRegisterView(AuthenticatedUser):
         return self.render(template_str, success_msg="Đăng ký lịch hẹn thành công!!!")
 
 
-class NurseCompleteView(AuthenticatedUser):
+class NurseCompleteView(EmployeeView):
     @expose('/', methods=['GET', 'POST'])
     def nurse_complete(self):
         today = datetime.today().date()
@@ -109,7 +109,7 @@ class NurseCompleteView(AuthenticatedUser):
         else:
             examination_date = datetime.strptime(examination_date, "%Y-%m-%d").date()
         if request.method == 'GET':
-            registration_data = dao.get_registration_form(examination_date)
+            registration_data = dao.get_registration_form(examination_date=examination_date)
 
             return self.render('admin/nurses/complete-view.html',
                                registration_data=registration_data,
@@ -126,7 +126,7 @@ class NurseCompleteView(AuthenticatedUser):
                            accepted=True)
 
 
-class NurseCompletePayment(AuthenticatedUser):
+class NurseCompletePayment(EmployeeView):
     @expose('/', methods=['GET', 'POST'])
     def complete_payment(self):
         phone_to_search = request.args.get('phone')
@@ -151,12 +151,11 @@ class NurseCompletePayment(AuthenticatedUser):
                            total_amount=total_amount)
 
 
-class DoctorExaminationList(AuthenticatedUser):
+class DoctorExaminationList(DoctorView):
     @expose('/', methods=['GET', 'POST'])
     def examination_list(self):
         today = datetime.today().date()
-
-        examination_data = dao.get_registration_form(examination_date=today)
+        examination_data = dao.get_registration_form(examination_date=today, used=False)
         return self.render('admin/doctor/examination_list.html',
                            examination_data=examination_data
                            )
@@ -165,6 +164,7 @@ class DoctorExaminationList(AuthenticatedUser):
     def create_medical_bill(self, registration_id):
         registration_form = dao.get_registration_form(id=registration_id)
         medicines = dao.get_medicines()
+
         return self.render('admin/doctor/medical_bill.html',
                            registration_form=registration_form,
                            medicines=medicines)

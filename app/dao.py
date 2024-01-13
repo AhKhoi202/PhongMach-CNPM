@@ -1,5 +1,7 @@
 from datetime import datetime, date
 
+from sqlalchemy import func
+
 from app.models import User, Role, MedicalBill, MedicalBillDetail, ExaminationBill, Medicine, RegistrationForm, \
     MedicineTag, Regulation, Gender, Unit
 from app import app, db
@@ -95,15 +97,22 @@ def get_regulation_value(key):
     return 0
 
 
+def get_history_examination(user_id):
+    return ExaminationBill.query.filter(ExaminationBill.patient_id == user_id)
+
+
 def get_registration_form(**kwargs):
+    print(kwargs)
     registration_forms = RegistrationForm.query
     id = kwargs.get("id")
     if id:
         return registration_forms.get(id)
     examination_date = kwargs.get("examination_date")
     registration_forms = registration_forms.filter(
-        RegistrationForm.examination_date == examination_date
+        RegistrationForm.examination_date == examination_date,
     )
+    if kwargs.get("used") is not None:
+        registration_forms = registration_forms.filter(RegistrationForm.used == False)
     return map_form_to_data(registration_forms)
 
 
@@ -117,6 +126,18 @@ def delete_examination(examination_id):
         except:
             return False
     return False
+
+
+def update_used_form(form_id):
+    if form_id is not None:
+        print(form_id)
+        form = RegistrationForm.query.get(form_id)
+        form.used = True
+        db.session.commit()
+        print(form_id)
+        return True
+    else:
+        return False
 
 
 def update_complete_form(complete_date):
@@ -163,7 +184,7 @@ def get_complete_payment(phone_to_search=None):
         ExaminationBill.examination_money,
         (ExaminationBill.medicine_money + ExaminationBill.examination_money).label('total_cost'),
         ExaminationBill.medical_bill_id
-    )
+    ).filter(ExaminationBill.paid == 0)
     if phone_to_search:
         query = query.filter(User.phone.ilike(f'%{phone_to_search}%'))
     results = query.all()
@@ -192,7 +213,8 @@ def update_complete_payment(ex_id):
             db.session.commit()
             return exam.paid
         return []
-    except:
+    except Exception as e:
+        print(e)
         return []
 
 
@@ -221,17 +243,101 @@ def get_medicine_details(medical_bill_id):
 
         }
         medicine_details.append(detail)
-
     return medicine_details, total_amount
+
+
+def create_medical_bill(**kwargs):
+    print('create_medical_bill')
+    new_medical_bill = MedicalBill(**kwargs)
+    db.session.add(new_medical_bill)
+    db.session.commit()
+    db.session.flush()
+    return new_medical_bill
+
+
+def save_detail(bill, details):
+    print('save_detail')
+    try:
+        total = 0
+        for item_id, item_data in details.items():
+            total = total + item_data['price'] * item_data['quantity']
+            detail = MedicalBillDetail(quantity=item_data['quantity'], medicine_id=item_data['id'], medical_bill=bill)
+            db.session.add(detail)
+        db.session.commit()
+        db.session.flush()
+        return total
+    except Exception as e:
+        print(e)
+        return -1
+
+
+def save_examination_bill(**kwargs):
+    print('save_examination_bill')
+    new_examination_bill = ExaminationBill(**kwargs)
+    db.session.add(new_examination_bill)
+    db.session.commit()
+    db.session.flush()
+    return new_examination_bill
+
+
+def stats_revenue(kw=None):
+    # Thống kê doanh thu
+    revenue_stats_query = (
+        db.session.query(
+            func.extract('month', MedicalBill.examination_date).label('month'),
+            func.sum(ExaminationBill.medicine_money + ExaminationBill.examination_money).label('total_revenue')
+        )
+        .join(ExaminationBill, MedicalBill.id == ExaminationBill.medical_bill_id)
+    )
+    if kw:
+        year = int(kw)
+        revenue_stats_query = revenue_stats_query.filter(func.extract('year', MedicalBill.examination_date) == year)
+    revenue_stats = revenue_stats_query.group_by(func.extract('month', MedicalBill.examination_date)).all()
+    # Thống kê tần suất khám
+    examination_frequency = (
+        db.session.query(
+            func.extract('month', MedicalBill.examination_date).label('month'),
+            func.count(MedicalBill.id).label('examination_count')
+        )
+        .join(ExaminationBill, MedicalBill.id == ExaminationBill.medical_bill_id)
+    )
+    if kw:
+        year = int(kw)
+        examination_frequency = examination_frequency.filter(func.extract('year', MedicalBill.examination_date) == year)
+    examination_frequency = examination_frequency.group_by(func.extract('month', MedicalBill.examination_date)).all()
+    return revenue_stats, examination_frequency
+
+
+def stats_medicine(selected_month, selected_year=2024):
+    return db.session.query(Medicine.name,
+                            func.count(MedicalBillDetail.medicine_id),
+                            func.sum(MedicalBillDetail.quantity)) \
+        .join(MedicalBillDetail, Medicine.id == MedicalBillDetail.medicine_id) \
+        .join(MedicalBill, MedicalBill.id == MedicalBillDetail.medical_bill_id) \
+        .filter(func.extract('year', MedicalBill.examination_date) == selected_year) \
+        .filter(func.extract('month', MedicalBill.examination_date) == selected_month) \
+        .group_by(Medicine.name).all()
 
 
 if __name__ == '__main__':
     with app.app_context():
         new_date = date(2024, 1, 3)
-        today = datetime.today().date()
-        bill = get_regulation_value('user_in_1_day')
+        # today = datetime.today().date()
+        # bill = get_regulation_value('user_in_1_day')
         # print(today)
-        registration_data = get_registration_form(today)
-        print(registration_data)
-        # payment = get_medicine_details(1)
-        # print(payment)
+        # # registration_data = get_registration_form(today)
+        # # print(registration_data)
+        # # payment = get_medicine_details(1)
+        # # print(payment)
+        # new_medical_bill = create_medical_bill(examination_date=datetime.now(), symptom="Ho nhiều",
+        #                                        patient_id=1, doctor_id=2)
+        # print(new_medical_bill)
+        month = 1
+        year = 2024  # Năm cần thống kê
+        revenue_stats, examination_frequency = stats_revenue(year)
+        print("Thống kê doanh thu và tần suất khám cho tháng: {}".format(revenue_stats))
+        print("Tần suất khám cho tháng: {}".format(examination_frequency))
+
+        # Gọi hàm stats_medicine_usage_by_month
+        medicine_usage_stats = stats_medicine(month, year)
+        print("Thống kê tần suất sử dụng thuốc cho tháng {}: {}".format(month, medicine_usage_stats))

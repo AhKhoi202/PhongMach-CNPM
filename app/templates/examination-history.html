@@ -19,17 +19,20 @@
         </tr>
         </thead>
         <tbody>
+        {% for bill in examination_bills %}
         <tr>
-            <td>2023-12-23</td>
-            <td>Ho và sốt</td>
-            <td>Cảm cúm</td>
-            <td>Bác sĩ B</td>
-            <td>200,000 VND</td>
-            <td>150,000 VND</td>
+            <td>{{ bill.examination_date }}</td>
+            <td>{{ bill.medical_bill.symptom }}</td>
+            <td>{{ bill.medical_bill.disease_prediction }}</td>
+            <td>{{ bill.medical_bill.doctor.fullname }}</td>
+            <td>{{ bill.medicine_money }} VNĐ</td>
+            <td>{{ bill.examination_money }} VNĐ</td>
             <td>
                 <button class="btn btn-primary detail-btn" data-id="1">Chi tiết hóa đơn</button>
             </td>
         </tr>
+        {% endfor %}
+
         </tbody>
     </table>
 </div>

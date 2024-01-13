@@ -16,7 +16,7 @@ login_manager = LoginManager(app=app)
 # def load_locale():
 #     return 'vi'
 # database config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/phongmachdb?charset=utf8mb4' % quote('')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sql12676669:%s@sql12.freemysqlhosting.net/sql12676669?charset=utf8mb4' % quote('ByPrB1QvRu')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app=app)
 

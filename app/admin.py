@@ -1,9 +1,8 @@
-from flask import redirect
+from datetime import datetime
+from flask import redirect, request
 from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from sqlalchemy import func
-
-from app import app, db
+from app import app, db, dao
 from app.models import Role, User, Medicine, RegistrationForm, Regulation
 from flask_login import logout_user, current_user
 
@@ -59,6 +58,7 @@ class RegistrationFormView(AuthenticatedAdmin):
 
 
 class RegulationView(AuthenticatedAdmin):
+    can_delete = False
     column_list = ['description', 'value']
     column_labels = {
         'description': 'Quy định',
@@ -67,14 +67,23 @@ class RegulationView(AuthenticatedAdmin):
 
 
 class MyStatsView(AuthenticatedUser):
-    @expose("/")
+    @expose("/", methods=['GET'])
     def index(self):
-        return self.render('admin/pages/stats.html')
+        selected_month = request.args.get('month', type=int)
+        selected_year = request.args.get('year', type=int)
+        if selected_month is None:
+            selected_month = datetime.now().month
+            selected_year = datetime.now().year
+        print(selected_month, selected_year)
+        revenue_stats, examination_frequency = dao.stats_revenue(selected_year)
+        medicine_usage_stats = dao.stats_medicine(selected_month, selected_year)
 
-    @expose("/logout")
-    def logout(self):
-        logout_user()
-        return redirect('/')
+        return self.render('admin/pages/stats.html',
+                           revenue_stats=revenue_stats,
+                           examination_frequency=examination_frequency,
+                           medicine_usage_stats=medicine_usage_stats,
+                           selected_month=selected_month,
+                           selected_year=selected_year)
 
 
 class MyLogoutView(AuthenticatedUser):

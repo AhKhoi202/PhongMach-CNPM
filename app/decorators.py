@@ -2,7 +2,6 @@ from functools import wraps
 from urllib.parse import urlparse
 from flask import redirect, request
 from flask_login import current_user
-from app import dao
 
 
 def anonymous_user(f):

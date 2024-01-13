@@ -1,12 +1,12 @@
 from datetime import datetime
 import cloudinary.uploader
 from cloudinary.provisioning import user
-from flask import render_template, request, redirect, url_for, jsonify
+from flask import render_template, request, redirect, url_for, jsonify, session
 from flask_login import logout_user, login_user, current_user
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 
 from app import app, login_manager, dao, decorators
-from app.models import Gender, Role
+from app.models import Gender, Role, User
 from app.utils import is_past_date
 
 
@@ -44,6 +44,10 @@ def login_process():
         user = dao.auth_user(username=username, password=password)
         if user:
             login_user(user=user)
+            if user.role == Role.Admin:
+                return redirect('/admin')
+            if user.role == Role.Doctor or user.role == Role.Nurse:
+                return redirect('/nurse')
             url_next = request.args.get('next')
             return redirect(url_next if url_next else '/')
         return redirect(url_for('index'))
@@ -104,6 +108,7 @@ def registration_form_process():
 
     form = request.form
     examination_date = request.form.get('examination_date')
+    print(examination_date)
     examination_date = datetime.strptime(examination_date, '%Y-%m-%d').date()
     user_in_1_day = dao.get_regulation_value('user_in_1_day')
     if dao.count_registration_forms_by_date(examination_date) >= user_in_1_day:
@@ -139,7 +144,90 @@ def delete_exam(exam_id):
 @app.route('/history')
 @decorators.authenticated_user
 def history():
-    return render_template('examination-history.html')
+    examination_bills = dao.get_history_examination(current_user.id)
+    return render_template('examination-history.html', examination_bills=examination_bills)
+
+
+@app.route('/api/history/<int:user_id>')
+def view_history(user_id):
+    bills = dao.get_history_examination(user_id)
+    data = []
+    for bill in bills:
+        data.append({
+            'symptom': bill.medical_bill.symptom,
+            'prediction': bill.medical_bill.disease_prediction,
+            'examination_date': str(bill.examination_date),
+        })
+
+    return jsonify(data)
+
+
+@app.route('/api/medicine', methods=['POST'])
+@decorators.authenticated_user
+def add_medicine_to_cart():
+    """
+    session: {
+        "bill": {
+            "1": {
+                "id": "1",
+                "quantity": 2
+            },
+            "2": {
+                "id": "2",
+                "quantity": 1
+            }
+        }
+    }
+    :return:
+    """
+    data = request.json
+    print(data)
+    bill = session.get('bill')
+    if bill is None:
+        bill = {}
+
+    id = str(data.get("id"))
+    quantity = int(data.get("quantity"))
+    price = data.get("price")
+    if id in bill:  # sp da co trong gio
+        bill[id]['quantity'] += 1
+    else:  # thuoc chua co trong hoa don
+        bill[id] = {
+            "id": int(id),
+            "quantity": quantity,
+            "price": price,
+            "name": data.get("name"),
+            "direction": data.get("direction"),
+            "unit": data.get("unit")
+        }
+    session['bill'] = bill
+
+    return jsonify(session['bill'])
+
+
+@app.route('/api/medicine/save', methods=['POST'])
+@decorators.authenticated_user
+def save_medical_bill():
+    bill = session.get('bill')
+    data = request.json
+    print(data)
+    symptom = data.get("symptom")
+    disease_prediction = data.get("prediction")
+    patient_id = data.get("patient_id")
+    form_id = data.get("form_id")
+
+    try:
+        medical_bill = dao.create_medical_bill(symptom=symptom, disease_prediction=disease_prediction,
+                                               doctor=current_user, patient_id=patient_id)
+        total = dao.save_detail(medical_bill, bill)
+        dao.save_examination_bill(medicine_money=total,
+                                  examination_money=dao.get_regulation_value('examination_price'),
+                                  medical_bill=medical_bill, patient_id=patient_id)
+        dao.update_used_form(form_id)
+        del session['bill']
+        return jsonify({"message": "Success"})
+    except:
+        return jsonify({"message": "Fail"})
 
 
 @login_manager.user_loader

@@ -4,7 +4,7 @@
 <style>
     .table-scroll {
         overflow-y: auto;
-        max-height: 200px;
+        max-height: 600px;
     }
 </style>
 {% if success_msg %}
@@ -66,7 +66,7 @@
                 <button
                         data-id="{{ record.user_id }}"
                         data-record-id="{{ record.id }}"
-                        {% if examination_date> today %}
+                        {% if examination_date> today or registration_data[0].accepted == True %}
                     disabled
                     class="btn btn-dark detail-btn delete"
                     {% else %}

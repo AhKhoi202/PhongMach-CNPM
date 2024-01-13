@@ -121,6 +121,7 @@ class RegistrationForm(BaseModel):
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
     examination_date = Column(Date, nullable=False)
     accepted = Column(Boolean, default=False)
+    used = Column(Boolean, default=False)
     user = relationship('User', back_populates='registration_forms', lazy=True)
 
     def __str__(self):
@@ -155,7 +156,6 @@ class MedicalBillDetail(BaseModel):
     __tablename__ = 'medical_bill_detail'
     __table_args__ = {'extend_existing': True}
     quantity = Column(Integer, default=1)
-    direction = Column(Text, nullable=False)
     medicine_id = Column(Integer, ForeignKey(Medicine.id), nullable=False)
     medical_bill_id = Column(Integer, ForeignKey(MedicalBill.id), nullable=False)
 
@@ -181,7 +181,7 @@ class ExaminationBill(BaseModel):
 
 
 class Regulation(BaseModel):
-    __tablename__ = 'Regulation'
+    __tablename__ = 'regulation'
     __table_args__ = {'extend_existing': True}
     key = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
