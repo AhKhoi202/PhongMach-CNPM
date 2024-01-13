@@ -55,18 +55,10 @@
             <td>{{ record.birthday }}</td>
             <td>{{ record.examination_date }}</td>
             <td>
-                {% if registration_data[0].accepted == True %}
-                <button
-                        class="btn btn-success detail-btn"
-                        disabled
-                >
-                    Đã xác nhận
-                </button>
-                {% endif %}
                 <button
                         data-id="{{ record.user_id }}"
                         data-record-id="{{ record.id }}"
-                        {% if examination_date> today or registration_data[0].accepted == True %}
+                        {% if examination_date> today or registration_data[0].accepted == True and registration_data[-1].accepted == True %}
                     disabled
                     class="btn btn-dark detail-btn delete"
                     {% else %}
@@ -83,7 +75,7 @@
     </div>
 
     {% if examination_date >= today %}
-    {% if registration_data[0].accepted == True %}
+    {% if registration_data[0].accepted == True and registration_data[-1].accepted == True %}
     <div class="alert alert-success" role="alert">
         <h4 class="alert-heading">Đã xác nhận lịch khám </h4>
     </div>
