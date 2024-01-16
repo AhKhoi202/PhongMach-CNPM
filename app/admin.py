@@ -106,7 +106,7 @@ admin = Admin(app=app,
               endpoint='admin',
               url='/admin')
 admin.add_view(UserView(User, db.session, name="Người dùng"))
-admin.add_view(MedicineView(Medicine, db.session, name="Thuốc"))
+admin.add_view(MedicineView(Medicine, db.session, name="Quản lý thuốc"))
 admin.add_view(RegistrationFormView(RegistrationForm, db.session, name="Đơn đăng ký khám bệnh"))
 admin.add_view(RegulationView(Regulation, db.session, name="Quy định"))
 admin.add_view(MyStatsView(name='Thống kê báo cáo', endpoint="statistics"))

@@ -191,9 +191,9 @@ def add_medicine_to_cart():
     id = str(data.get("id"))
     quantity = int(data.get("quantity"))
     price = data.get("price")
-    if id in bill:  # sp da co trong gio
+    if id in bill:
         bill[id]['quantity'] += 1
-    else:  # thuoc chua co trong hoa don
+    else:
         bill[id] = {
             "id": int(id),
             "quantity": quantity,

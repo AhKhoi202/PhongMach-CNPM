@@ -188,7 +188,7 @@
     }
 
     window.onload = () => {
-    // Iterate over the medicines and add them to the array
+    // Lặp lại các loại thuốc và thêm vào mảng
         {% for medicine in medicines %}
             var medicineData = {
                 id: {{ medicine.id }},
@@ -217,7 +217,6 @@
         const name = getNameFromId(id);
         const direction = getDirectionFromId(id);
         const unit = getUnitFromId(id);
-
         addMedicineToBill(id, getPriceFromId(id), quantity, name, direction, unit);
     }
     document.getElementById('medicine').onchange = () => {

@@ -16,8 +16,8 @@ login_manager = LoginManager(app=app)
 # def load_locale():
 #     return 'vi'
 # database config
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost:3306/phongmachdb?charset=utf8mb4' % quote('')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ahkhoi202:%s@ahkhoi202.mysql.pythonanywhere-services.com/ahkhoi202$default?charset=utf8mb4' % quote('Admin@123')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost:3306/phongmachdb?charset=utf8mb4' % quote('')
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://ahkhoi202:%s@ahkhoi202.mysql.pythonanywhere-services.com/ahkhoi202$default?charset=utf8mb4' % quote('Admin@123')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app=app)
 
@@ -28,7 +28,7 @@ cloudinary.config(cloud_name='dcvdmnrvo', api_key='483432986537474', api_secret=
 from twilio.rest import Client
 
 account_sid = 'AC28f8609c24a6201bb1fa843e4f5eb432'
-auth_token = '915eb1c20399b07bd1d2a45bdbd4842e'
+auth_token = '8f4910c87cf148f6d6e9ed0007545426'
 client = Client(account_sid, auth_token)
 
 # validation_request = client.validation_requests.create(
