@@ -28,7 +28,7 @@ cloudinary.config(cloud_name='dcvdmnrvo', api_key='483432986537474', api_secret=
 from twilio.rest import Client
 
 account_sid = 'AC28f8609c24a6201bb1fa843e4f5eb432'
-auth_token = '8f4910c87cf148f6d6e9ed0007545426'
+auth_token = '5a50a4f5464face7b8ec8009284fb133'
 client = Client(account_sid, auth_token)
 
 # validation_request = client.validation_requests.create(
